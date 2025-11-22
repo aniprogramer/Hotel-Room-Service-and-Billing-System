@@ -1,0 +1,22 @@
+{
+  "name": "main_website",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "Aniket",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "method-override": "^3.0.0",
+    "mysql2": "^3.15.3"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^10.1.0"
+  }
+}

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('./partials/header') %>
+    <title>Dashboard | Hotel Room Service</title>
+  </head>
+  <body class="bg-light">
+    <%- include('./partials/navbar', { user }) %>
+
+    <div class="container text-center py-5">
+      <div class="card shadow-lg border-0 mx-auto" style="max-width: 650px;">
+        <div class="card-body py-5">
+          <h3 class="fw-bold text-primary mb-3">Welcome, <%= user.full_name %> 👋</h3>
+          <p class="text-muted mb-4">
+            You are logged in as <strong><%= user.role_name %></strong>.
+          </p>
+
+          <% if (user.role_name === 'Guest') { %>
+            <p class="lead">You can view our menu, place room service orders, and check your invoices.</p>
+            <a href="/guest/menu" class="btn btn-primary px-4 mt-3">Go to Menu</a>
+
+          <% } else if (user.role_name === 'Kitchen Staff') { %>
+            <p class="lead">Manage all incoming orders and update their preparation status.</p>
+            <a href="/kitchen/orders" class="btn btn-success px-4 mt-3">View Orders</a>
+
+          <% } else if (user.role_name === 'Delivery Staff') { %>
+            <p class="lead">View your assigned deliveries and mark them as delivered once done.</p>
+            <a href="/delivery/deliveries" class="btn btn-info px-4 mt-3">View Deliveries</a>
+
+          <% } else if (user.role_name === 'Billing Staff') { %>
+            <p class="lead">Check invoices, record new payments, and manage billing records.</p>
+            <a href="/billing/invoices" class="btn btn-warning px-4 mt-3">Manage Invoices</a>
+
+          <% } else { %>
+            <p class="text-danger">Invalid role. Please contact the administrator.</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <%- include('./partials/footer') %>
+  </body>
+</html>

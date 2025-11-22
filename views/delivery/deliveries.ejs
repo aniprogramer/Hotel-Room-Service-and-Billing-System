@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/header') %>
+    <title>Deliveries | Hotel Room Service</title>
+  </head>
+  <body class="bg-light">
+    <%- include('../partials/navbar', { user, active: 'deliveries' }) %>
+
+    <div class="container py-4">
+      <h3 class="fw-bold text-primary text-center mb-4">🚚 Delivery Dashboard</h3>
+
+      <% if (!deliveries.length) { %>
+        <div class="alert alert-info text-center shadow-sm">
+          No deliveries assigned yet. Please check again later!
+        </div>
+      <% } else { %>
+        <div class="table-responsive">
+          <table class="table table-bordered text-center align-middle shadow-sm">
+            <thead class="table-primary">
+              <tr>
+                <th>Delivery ID</th>
+                <th>Order ID</th>
+                <th>Guest Name</th>
+                <th>Room</th>
+                <th>Status</th>
+                <th>Assigned Time</th>
+                <th>Delivered Time</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% deliveries.forEach(delivery => { %>
+                <tr>
+                  <td><%= delivery.delivery_id %></td>
+                  <td><%= delivery.order_id %></td>
+                  <td><%= delivery.full_name %></td>
+                  <td><%= delivery.room_number %></td>
+                  <td>
+                    <span class="badge bg-<%= 
+                      delivery.delivery_status === 'DELIVERED' ? 'success' :
+                      delivery.delivery_status === 'IN_PROGRESS' ? 'warning' : 'secondary' %>">
+                      <%= delivery.delivery_status %>
+                    </span>
+                  </td>
+                  <td>
+                    <%= new Date(delivery.assigned_at).toLocaleString('en-IN', { hour12: true }) %>
+                  </td>
+                  <td>
+                    <%= delivery.delivered_at 
+                        ? new Date(delivery.delivered_at).toLocaleString('en-IN', { hour12: true }) 
+                        : '-' %>
+                  </td>
+                  <td>
+                    <% if (delivery.delivery_status !== 'DELIVERED') { %>
+                      <form 
+                        action="/delivery/deliveries/complete/<%= delivery.order_id %>"
+                        method="POST">
+                        <button type="submit" class="btn btn-sm btn-success">
+                          Mark Delivered
+                        </button>
+                      </form>
+                    <% } else { %>
+                      <span class="text-success fw-semibold">✅ Delivered</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+
+    <%- include('../partials/footer') %>
+  </body>
+</html>

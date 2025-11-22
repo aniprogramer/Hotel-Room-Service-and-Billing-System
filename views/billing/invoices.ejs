@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/header') %>
+    <title>Invoices | Hotel Billing System</title>
+  </head>
+  <body class="bg-light">
+    <%- include('../partials/navbar', { user, active: 'invoices' }) %>
+
+    <div class="container py-4">
+      <h3 class="fw-bold text-primary text-center mb-4">💳 Billing Dashboard</h3>
+
+      <% if (!invoices.length) { %>
+        <div class="alert alert-info text-center shadow-sm">
+          No invoices generated yet.
+        </div>
+      <% } else { %>
+        <div class="table-responsive">
+          <table class="table table-bordered text-center align-middle shadow-sm">
+            <thead class="table-primary">
+              <tr>
+                <th>Invoice ID</th>
+                <th>Invoice No</th>
+                <th>Guest Name</th>
+                <th>Total (₹)</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% invoices.forEach(inv => { %>
+                <tr>
+                  <td><%= inv.invoice_id %></td>
+                  <td><%= inv.invoice_number %></td>
+                  <td><%= inv.full_name %></td>
+                  <td>₹<%= Number(inv.total_amount).toFixed(2) %></td>
+                  <td>
+                    <span class="badge bg-<%= inv.paid ? 'success' : 'danger' %>">
+                      <%= inv.paid ? 'Paid' : 'Pending' %>
+                    </span>
+                  </td>
+                  <td>
+                    <% if (!inv.paid) { %>
+                      <a href="/billing/pay/<%= inv.invoice_id %>" class="btn btn-sm btn-success">
+                        Record Payment
+                      </a>
+                    <% } else { %>
+                      <span class="text-success fw-semibold">✅ Paid</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+
+    <%- include('../partials/footer') %>
+  </body>
+</html>

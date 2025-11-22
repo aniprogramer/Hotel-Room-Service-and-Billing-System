@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/header') %>
+    <title>Kitchen Orders | Hotel Service</title>
+  </head>
+  <body class="bg-light">
+    <%- include('../partials/navbar', { user, active: 'orders' }) %>
+
+    <div class="container py-4">
+      <h3 class="fw-bold text-primary text-center mb-4">👨‍🍳 Kitchen Order Dashboard</h3>
+
+      <% if (!orders.length) { %>
+        <div class="alert alert-info text-center shadow-sm">
+          No active orders right now. Relax and wait for new ones! ☕
+        </div>
+      <% } else { %>
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle text-center shadow-sm">
+            <thead class="table-primary">
+              <tr>
+                <th>Order ID</th>
+                <th>Guest</th>
+                <th>Room</th>
+                <th>Status</th>
+                <th>Total (₹)</th>
+                <th>Update</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% orders.forEach(order => { %>
+                <tr>
+                  <td><%= order.order_id %></td>
+                  <td><%= order.guest_name %></td>
+                  <td><%= order.room_number %></td>
+                  <td>
+                    <span class="badge bg-<%= 
+                      order.status === 'READY' ? 'success' :
+                      order.status === 'PREPARING' ? 'warning' :
+                      'secondary' %>">
+                      <%= order.status %>
+                    </span>
+                  </td>
+                  <td>₹<%= Number(order.total_amount).toFixed(2) %></td>
+                  <td>
+                    <form
+                      action="/kitchen/orders/update/<%= order.order_id %>"
+                      method="POST"
+                      class="d-flex justify-content-center align-items-center gap-2"
+                    >
+                      <select
+                        name="status"
+                        class="form-select form-select-sm"
+                        style="width: 150px;"
+                      >
+                        <option value="PLACED" <%= order.status === 'PLACED' ? 'selected' : '' %>>PLACED</option>
+                        <option value="PREPARING" <%= order.status === 'PREPARING' ? 'selected' : '' %>>PREPARING</option>
+                        <option value="READY" <%= order.status === 'READY' ? 'selected' : '' %>>READY</option>
+                      </select>
+                      <button type="submit" class="btn btn-sm btn-success">Update</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+
+    <%- include('../partials/footer') %>
+  </body>
+</html>

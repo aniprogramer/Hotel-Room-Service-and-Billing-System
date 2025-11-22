@@ -1,0 +1,73 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+  <div class="container">
+    <!-- 🏨 Brand Logo -->
+    <a class="navbar-brand fw-bold" href="/dashboard">
+      🏨 Hotel Service
+    </a>
+
+    <!-- 📱 Toggler for mobile -->
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- 🔗 Navbar Links -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-center">
+
+        <% if (user && user.role_name === 'Guest') { %>
+          <!-- 👤 Guest Navigation -->
+          <li class="nav-item">
+            <a class="nav-link <%= (active === 'menu' ? 'active fw-bold' : '') %>" href="/guest/menu">Menu</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link <%= (active === 'orders' ? 'active fw-bold' : '') %>" href="/guest/orders">My Orders</a>
+          </li>
+
+        <% } else if (user && user.role_name === 'Kitchen Staff') { %>
+          <!-- 👨‍🍳 Kitchen Staff -->
+          <li class="nav-item">
+            <a class="nav-link <%= (active === 'orders' ? 'active fw-bold' : '') %>" href="/kitchen/orders">Orders</a>
+          </li>
+
+        <% } else if (user && user.role_name === 'Delivery Staff') { %>
+          <!-- 🚚 Delivery Staff -->
+          <li class="nav-item">
+            <a class="nav-link <%= (active === 'deliveries' ? 'active fw-bold' : '') %>" href="/delivery/deliveries">Deliveries</a>
+          </li>
+
+        <% } else if (user && user.role_name === 'Billing Staff') { %>
+          <!-- 💳 Billing Staff -->
+          <li class="nav-item">
+            <a class="nav-link <%= (active === 'invoices' ? 'active fw-bold' : '') %>" href="/billing/invoices">Invoices</a>
+          </li>
+        <% } %>
+
+        <!-- Divider -->
+        <% if (user) { %>
+          <li class="nav-item mx-2 text-white fw-bold">|</li>
+        <% } %>
+
+        <!-- 👋 User Info + Logout -->
+        <% if (user) { %>
+          <li class="nav-item">
+            <span class="navbar-text text-white small me-3">
+              Welcome, <%= user.full_name %>
+            </span>
+          </li>
+          <li class="nav-item">
+            <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
+          </li>
+        <% } else { %>
+          <li class="nav-item">
+            <a href="/login" class="btn btn-light btn-sm">Login</a>
+          </li>
+        <% } %>
+      </ul>
+    </div>
+  </div>
+</nav>

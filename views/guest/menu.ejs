@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/header') %>
+    <title>Menu | Hotel Service</title>
+  </head>
+  <body class="bg-light">
+    <%- include('../partials/navbar', { user, active: 'menu' }) %>
+
+    <div class="container py-4">
+      <h3 class="text-center fw-bold text-primary mb-4">🍽 Our Menu</h3>
+
+      <form action="/guest/order" method="POST">
+        <div class="row">
+          <% let cat = ''; menuItems.forEach((item,i)=>{ 
+              if(item.category_name!==cat){ cat=item.category_name; %>
+                <div class="col-12 mt-4">
+                  <h5 class="fw-bold border-bottom pb-2"><%= cat %></h5>
+                </div>
+          <% } %>
+          <div class="col-md-4 mt-3">
+            <div class="card shadow-sm border-0 h-100">
+              <div class="card-body">
+                <h6 class="fw-bold"><%= item.name %></h6>
+                <p class="text-muted small"><%= item.description || '' %></p>
+                <p class="fw-bold text-success">₹<%= item.price.toFixed(2) %></p>
+                <input type="number" min="0" value="0" name="items[<%=i%>][quantity]" class="form-control form-control-sm mb-2" />
+                <input type="hidden" name="items[<%=i%>][menu_id]" value="<%=item.menu_id%>" />
+                <input type="hidden" name="items[<%=i%>][price]" value="<%=item.price%>" />
+              </div>
+            </div>
+          </div>
+          <% }); %>
+        </div>
+
+        <div class="text-center mt-4">
+          <button class="btn btn-primary px-5">Place Order</button>
+        </div>
+      </form>
+    </div>
+
+    <%- include('../partials/footer') %>
+  </body>
+</html>

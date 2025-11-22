@@ -1,0 +1,76 @@
+hotel-room-service-billing-system/
+│
+├── server.js                         # 🌐 Main entry file (runs the app)
+├── package.json                      # 📦 Project dependencies
+│
+├── /config/                          #⚙️ Configuration files
+│   └── db.js                         # Database connection setup (MySQL)
+│
+├── /routes/                          # 🧭 Handles routing (URLs)
+│   ├── authRoutes.js                 # Login / Logout routes
+│   ├── guestRoutes.js                # Guest-side routes (menu, orders, invoice)
+│   ├── kitchenRoutes.js              # Kitchen staff routes (order queue)
+│   ├── deliveryRoutes.js             # Delivery staff routes
+│   └── billingRoutes.js              # Billing staff routes
+│
+├── /controllers/                     # 🧠 Route logic (talks to DB)
+│   ├── authController.js             # Handles authentication
+│   ├── guestController.js            # Guest functions
+│   ├── kitchenController.js          # Kitchen functions
+│   ├── deliveryController.js         # Delivery functions
+│   └── billingController.js          # Billing functions
+│
+├── /models/                          # 🧩 (Optional) Database abstraction (if you later use Sequelize or helper functions)
+│   └── queryHelpers.js               # Helper functions for DB queries
+│
+├── /views/                           # 🎨 Frontend EJS templates
+│   ├── partials/                     # Reusable page sections
+│   │   ├── header.ejs                # <head> with CSS and title
+│   │   ├── navbar.ejs                # Navigation bar (changes by role)
+│   │   └── footer.ejs                # Footer
+│   │
+│   ├── auth/                         # Login / Logout Pages
+│   │   ├── login.ejs                 # Login form
+│   │   └── logout.ejs                # Logout confirmation
+│   │
+│   ├── guest/                        # Guest Interface
+│   │   ├── menu.ejs                  # Menu listing from DB
+│   │   ├── placeOrder.ejs            # Order creation form
+│   │   ├── myOrders.ejs              # Guest order history
+│   │   └── invoice.ejs               # Guest invoice details
+│   │
+│   ├── kitchen/                      # Kitchen Staff Interface
+│   │   └── orders.ejs                # View/update pending orders
+│   │
+│   ├── delivery/                     # Delivery Staff Interface
+│   │   └── deliveries.ejs            # Assigned orders / mark delivered
+│   │
+│   ├── billing/                      # Billing Staff Interface
+│   │   ├── invoices.ejs              # View all invoices
+│   │   └── payments.ejs              # Record payments
+│   │
+│   └── dashboard.ejs                 # Dashboard redirect based on role
+│
+├── /public/                          # 📁 Static assets (served directly)
+│   ├── css/
+│   │   ├── style.css                 # Global styles
+│   │   └── dashboard.css             # Optional for dashboard
+│   │
+│   ├── js/
+│   │   └── main.js                   # Frontend interactivity (optional)
+│   │
+│   └── images/
+│       ├── logo.png
+│       ├── food/
+│       │   ├── biryani.jpg
+│       │   ├── paneer.jpg
+│       │   └── juices.jpg
+│       └── staff/
+│           ├── kitchen.jpg
+│           ├── delivery.jpg
+│           └── billing.jpg
+│
+└── /docs/                            # 📝 Optional documentation folder
+    ├── README.md                     # Project overview
+    ├── ER-Diagram.png                # Database diagram
+    └── Screenshots/                  # Webpage screenshots for your report

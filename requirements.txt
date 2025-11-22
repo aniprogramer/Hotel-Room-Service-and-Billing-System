@@ -1,0 +1,9 @@
+# Node.js dependencies for Hotel Room Service & Billing System
+express==5.1.0
+express-session==1.18.2
+ejs==3.1.10
+mysql2==3.15.3
+method-override==3.0.0
+
+# Dev dependencies (optional, for data seeding or testing)
+@faker-js/faker==10.1.0
