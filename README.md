@@ -123,8 +123,8 @@ Hotel Room Service & Billing System/
 ## 🔧 1. Clone the Repository
 
 ```bash
-git clone https://github.com/<your-username>/<repo>.git
-cd "<project-folder>"
+git clone https://github.com/aniprogramer/Hotel-Room-Service-and-Billing-System.git
+cd "Hotel Room Service and Billing System"
 ```
 
 ---
