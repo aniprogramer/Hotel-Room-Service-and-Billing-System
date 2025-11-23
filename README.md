@@ -150,43 +150,94 @@ You can also find them in `requirements.txt`.
 
 ---
 
-## 🗄️ 3. Setup Database
+# 🗄️ Database Setup (Using init_db.sql)
 
-### ✅ Step 1: Create the Database
+My project includes a full SQL initialization script:
 
-```sql
-CREATE DATABASE hotel_service_db;
-```
 
-### ✅ Step 2: Import `init_db.sql`
+This single file automatically:
 
-This single file contains:
+- Creates the database: **hotel_room_service_billing**
+- Switches to it
+- Disables & enables foreign key checks
+- Drops all tables (if they exist)
+- Recreates all tables (roles, users, menu, orders, invoices, payments, deliveries)
+- Inserts full seed data (users, rooms, categories, items, orders, etc.)
 
-* Tables
-* Menu categories
-* Menu items
-* Sample users
-* Rooms
-* Orders
-* Order items
-* Deliveries
-* Invoices
-* Payments
-
-Import using MySQL Workbench → *Server > Data Import*.
+No manual SQL work is required — just run the file once.
 
 ---
 
-## 🔌 4. Configure DB Connection
+## ✅ Option 1 — Run Using MySQL Workbench (Recommended)
 
-Update `/config/db.js`:
+1. Open **MySQL Workbench**
+2. Go to:  
+   **File → Open SQL Script**
+3. Select:  
+4. Click the **Execute (⚡ lightning)** button
+
+Done!  
+The database will be created and fully populated automatically.
+
+---
+
+## ✅ Option 2 — Run Using MySQL Command Line
+
+Open a terminal in the project folder:
+
+```bash
+mysql -u root -p < init_db.sql
+```
+Enter your MySQL password when asked.
+This executes the entire SQL file and sets up all tables + data.
+
+---
+
+## 🚀 Verify Database Setup
+
+After running the SQL file, open MySQL Workbench and run:
+
+```sql
+USE hotel_room_service_billing;
+SHOW TABLES;
+```
+
+You should see:
+
+```
+roles
+users
+rooms
+menu_categories
+menu_items
+orders
+order_items
+deliveries
+invoices
+payments
+```
+
+To confirm inserted data:
+
+```sql
+SELECT * FROM users;
+SELECT * FROM menu_items;
+SELECT * FROM orders;
+SELECT * FROM invoices;
+```
+
+---
+
+## 🔌 Configure Backend Connection
+
+Check `/config/db.js` and ensure it matches your SQL database:
 
 ```js
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
-  database: "hotel_service_db",
+  database: "hotel_room_service_billing",
   decimalNumbers: true
 });
 ```
