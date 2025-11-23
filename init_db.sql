@@ -2,8 +2,24 @@
 --   HOTEL ROOM SERVICE & BILLING SYSTEM — FULL INIT DATABASE
 -- ------------------------------------------------------------
 
+-- -----------------------------------------------------
+-- CREATING THE DATABASE IF IT DOESN'T EXISTS
+-- -----------------------------------------------------
+CREATE DATABASE IF NOT EXISTS hotel_room_service_billing;
+
+-- -------------------------------------
+-- SWITCHING TO OUR DATABASE
+-- -------------------------------------
+USE hotel_room_service_billing;
+
+-- -------------------------------------
+-- SETTING THE FOREIGN KEY CHECK TO 0
+-- -------------------------------------
 SET FOREIGN_KEY_CHECKS = 0;
 
+-- ---------------------------------------
+-- DROPPING ALL THE TABLES IF IT EXISTS
+-- ---------------------------------------
 DROP TABLE IF EXISTS payments;
 DROP TABLE IF EXISTS invoices;
 DROP TABLE IF EXISTS deliveries;
@@ -15,320 +31,376 @@ DROP TABLE IF EXISTS rooms;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS roles;
 
+-- ------------------------------------------
+-- SETTING THE FOREIGN KEY CHECK TO 1
+-- ------------------------------------------
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- ---------------------------------------------
+-- CREATING AND INSERTING VALUES INSIDE VALUES
+-- ---------------------------------------------
 
 -- -------------------------
 -- ROLES
 -- -------------------------
 CREATE TABLE roles (
-    role_id INT AUTO_INCREMENT PRIMARY KEY,
-    role_name VARCHAR(50) NOT NULL UNIQUE
+    role_id INT PRIMARY KEY AUTO_INCREMENT,
+    role_name VARCHAR(30) UNIQUE NOT NULL,
+    description TEXT
 );
 
-INSERT INTO roles (role_name) VALUES
-('Guest'),
-('Kitchen Staff'),
-('Delivery Staff'),
-('Billing Staff');
+
+INSERT INTO roles (role_name, description)
+VALUES
+('Guest', 'Hotel guest who orders food'),
+('Kitchen Staff', 'Prepares and manages food orders'),
+('Delivery Staff', 'Handles food deliveries to rooms'),
+('Billing Staff', 'Manages invoices and payments');
 
 -- -------------------------
 -- USERS
 -- -------------------------
 CREATE TABLE users (
-    user_id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    full_name VARCHAR(150) NOT NULL,
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(30) UNIQUE NOT NULL,
+    password_hash VARCHAR(100) NOT NULL,
+    full_name VARCHAR(50) NOT NULL,
+    email VARCHAR(50) UNIQUE,
+    phone VARCHAR(15),
     role_id INT NOT NULL,
     FOREIGN KEY (role_id) REFERENCES roles(role_id)
 );
 
-INSERT INTO users (username, password, full_name, role_id) VALUES
-('guest1', 'guest123', 'Guest User', 1),
-('kitchen1', 'kitchen123', 'Kitchen Staff', 2),
-('delivery1', 'delivery123', 'Delivery Staff', 3),
-('billing1', 'billing123', 'Billing Staff', 4);
+INSERT INTO users (username, password_hash, full_name, email, phone, role_id)
+VALUES
+-- Guests
+('ananya_guest', 'pass_123', 'Ananya Rao', 'ananya.rao@example.com', '9876500011', 1),
+('rahul_guest', 'pass_456', 'Rahul Shetty', 'rahul.shetty@example.com', '9876500012', 1),
+('meera_guest', 'pass_789', 'Meera Nair', 'meera.nair@example.com', '9876500013', 1),
+
+-- Kitchen Staff
+('chef_ajay', 'pass_chef1', 'Ajay Verma', 'ajay.verma@hotel.com', '9876500100', 2),
+('chef_sara', 'pass_chef2', 'Sara Thomas', 'sara.thomas@hotel.com', '9876500101', 2),
+
+-- Delivery Staff
+('ravi_delivery', 'pass_del1', 'Ravi Kumar', 'ravi.kumar@hotel.com', '9876500102', 3),
+('aarti_delivery', 'pass_del2', 'Aarti Singh', 'aarti.singh@hotel.com', '9876500103', 3),
+
+-- Billing Staff
+('nina_billing', 'pass_bill', 'Nina Fernandes', 'nina.fernandes@hotel.com', '9876500104', 4);
+
+-- -------------------------
+-- MENU CATEGORIES
+-- -------------------------
+CREATE TABLE menu_categories (
+    category_id INT PRIMARY KEY AUTO_INCREMENT,
+    category_name VARCHAR(50) UNIQUE NOT NULL,
+    description TEXT
+);
+
+INSERT INTO menu_categories (category_name) VALUES
+('Biryani', 'Delicious varieties of biryani prepared with authentic spices'),
+('Rice', 'Steamed, fried, or flavored rice dishes'),
+('Roti Items', 'Soft rotis, naans, and parathas fresh from the tandoor'),
+('Tandoori & Barbeque', 'Grilled tandoori and barbeque delicacies'),
+('Egg Items', 'Omelets, egg curries, and other egg-based dishes'),
+('Indian Gravy (Non-Veg)', 'Rich and spicy Indian curries with chicken, mutton, or fish'),
+('Indian Gravy (Veg)', 'Vegetarian curries cooked in authentic Indian style'),
+('Chinese Chicken', 'Chinese-style chicken dishes and gravies'),
+('Chinese Veg', 'Vegetarian Chinese delicacies'),
+('Chinese Rice', 'Varieties of Chinese-style fried rice and Schezwan rice'),
+('Soups', 'Hot and flavorful soups to start your meal'),
+('Fries', 'Crispy fried snacks and sides'),
+('Fresh Juices', 'Refreshing and natural fruit juices'),
+('Mojitos', 'Cool and energizing mojito drinks');
+
+-- -------------------------
+-- MENU ITEMS
+-- -------------------------
+CREATE TABLE menu_items (
+    menu_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL,
+    description VARCHAR(100),
+    category_id INT,
+    price DECIMAL(8,2) NOT NULL,
+    is_available TINYINT(1) DEFAULT 1,
+    FOREIGN KEY (category_id) REFERENCES menu_categories(category_id)
+);
+
+-- Seed all menu items
+INSERT INTO menu_items (name, description, category_id, price, is_available) VALUES
+-- 1️⃣ Biryani
+('Chicken Biryani', 'Traditional chicken biryani with rich spices', 1, 170.00, 1),
+('Mutton Biryani', 'Tender mutton pieces cooked in layered rice', 1, 260.00, 1),
+('Egg Biryani', 'Basmati rice with boiled and spiced eggs', 1, 120.00, 1),
+('Veg Biryani', 'Mixed vegetables cooked with aromatic rice', 1, 140.00, 1),
+('Paneer Biryani', 'Cottage cheese biryani in Indian style', 1, 150.00, 1),
+('Tikka Biryani', 'Chicken tikka mixed with flavorful rice', 1, 190.00, 1),
+
+-- 2️⃣ Rice
+('Ghee Rice', 'Fragrant rice cooked with ghee and mild spices', 2, 100.00, 1),
+('Curd Rice', 'South Indian style curd mixed with rice', 2, 90.00, 1),
+('Steam Rice', 'Plain steamed basmati rice', 2, 80.00, 1),
+('Jeera Rice', 'Rice flavored with cumin seeds', 2, 90.00, 1),
+('Masala Khichdi', 'Comforting lentil and rice mix with spices', 2, 100.00, 1),
+
+-- 3️⃣ Roti Items
+('Tandoori Roti', 'Crispy and soft tandoor-cooked roti', 3, 20.00, 1),
+('Butter Roti', 'Soft roti brushed with butter', 3, 25.00, 1),
+('Naan', 'Soft leavened bread from tandoor', 3, 30.00, 1),
+('Butter Naan', 'Naan topped with butter', 3, 40.00, 1),
+('Garlic Naan', 'Naan flavored with garlic and herbs', 3, 40.00, 1),
+('Kulcha', 'Soft flatbread served with gravies', 3, 30.00, 1),
+('Butter Kulcha', 'Kulcha topped with butter', 3, 40.00, 1),
+('Kerala Parota', 'Layered flaky South Indian parota', 3, 15.00, 1),
+
+-- 4️⃣ Tandoori & Barbeque
+('Chicken Tikka (Full)', 'Full plate of chicken tikka cooked on charcoal', 4, 580.00, 1),
+('Chicken Tikka (Half)', 'Half plate of juicy chicken tikka', 4, 290.00, 1),
+('Chicken Tikka', 'Single portion of tandoori chicken tikka', 4, 70.00, 1),
+('Chicken Tikka Boneless', 'Boneless version of chicken tikka', 4, 350.00, 1),
+('Reshmi Kabab (8pc)', 'Creamy grilled chicken kebabs', 4, 330.00, 1),
+('Chicken Seek Kabab (8pc)', 'Spicy ground chicken kebabs on skewers', 4, 340.00, 1),
+('Paneer Tikka', 'Charcoal-grilled cottage cheese cubes', 4, 290.00, 1),
+
+-- 5️⃣ Egg Items
+('Egg Chilly', 'Egg cubes tossed with spicy sauce', 5, 90.00, 1),
+('Egg Manchurian', 'Crispy egg pieces in Chinese sauce', 5, 90.00, 1),
+('Egg Pepper Fry', 'Fried egg tossed with black pepper', 5, 90.00, 1),
+('Egg 65', 'South Indian style spicy fried egg', 5, 90.00, 1),
+('Boiled Egg', 'Simple boiled eggs served with salt & pepper', 5, 10.00, 1),
+
+-- 6️⃣ Indian Gravy (Non-Veg)
+('Egg Masala', 'Egg curry cooked in rich masala gravy', 6, 90.00, 1),
+('Egg Kolhapuri', 'Eggs cooked in Kolhapuri-style masala', 6, 90.00, 1),
+('Chicken Masala', 'Classic chicken masala curry', 6, 170.00, 1),
+('Chicken Kadai', 'Chicken cooked with capsicum and onions', 6, 190.00, 1),
+('Chicken Kolhapuri', 'Spicy chicken curry with coconut base', 6, 190.00, 1),
+('Butter Chicken', 'Creamy tomato gravy with butter and chicken', 6, 230.00, 1),
+('Chicken Punjabi', 'Rich Punjabi-style chicken curry', 6, 260.00, 1),
+('Mutton Masala', 'Tender mutton in aromatic gravy', 6, 250.00, 1),
+('Mutton Hyderabadi', 'Mutton curry with Hyderabadi spices', 6, 280.00, 1),
+('Mutton Rogan Josh', 'Famous Kashmiri mutton curry', 6, 300.00, 1),
+
+-- 7️⃣ Indian Gravy (Veg)
+('Dal Fry', 'Yellow lentils cooked with ghee and spices', 7, 90.00, 1),
+('Dal Tadka', 'Dal tempered with garlic and cumin', 7, 100.00, 1),
+('Mix Veg Curry', 'Mixed vegetable curry', 7, 100.00, 1),
+('Veg Kadai', 'Vegetables cooked in kadai masala', 7, 140.00, 1),
+('Veg Handi', 'Creamy mixed veg curry', 7, 150.00, 1),
+('Kaaju Masala', 'Cashew-based rich curry', 7, 240.00, 1),
+('Paneer Masala', 'Paneer cooked in onion-tomato gravy', 7, 160.00, 1),
+('Paneer Butter Masala', 'Creamy paneer in buttery gravy', 7, 170.00, 1),
+('Paneer Tikka Masala', 'Paneer tikka cooked in spicy gravy', 7, 200.00, 1),
+('Mushroom Kadai', 'Mushroom cooked with bell peppers', 7, 180.00, 1),
+('Mushroom Masala', 'Classic mushroom curry', 7, 160.00, 1),
+
+-- 8️⃣ Chinese Chicken
+('Chicken Chilli Dry', 'Crispy chicken in spicy sauce', 8, 170.00, 1),
+('Chicken Manchurian', 'Chinese-style chicken balls in sauce', 8, 170.00, 1),
+('Chicken Chilli Gravy', 'Chicken cooked in hot garlic sauce', 8, 180.00, 1),
+('Chicken Honey Chilli', 'Sweet and spicy chicken dish', 8, 180.00, 1),
+('Chicken Chilli Boneless', 'Boneless spicy chicken dish', 8, 190.00, 1),
+('Chicken 65', 'Spicy deep-fried chicken pieces', 8, 200.00, 1),
+('Chicken Lollipop', 'Deep-fried chicken drumettes', 8, 230.00, 1),
+('Chicken Drumstick', 'Marinated chicken drumsticks', 8, 240.00, 1),
+('Schezwan Chicken', 'Spicy Schezwan-style chicken', 8, 180.00, 1),
+
+-- 9️⃣ Chinese Veg
+('Gobi Manchurian', 'Cauliflower fritters in tangy sauce', 9, 100.00, 1),
+('Gobi 65', 'Crispy fried cauliflower bites', 9, 110.00, 1),
+('Gobi Chilly', 'Spicy cauliflower dish with peppers', 9, 100.00, 1),
+('Paneer Manchurian', 'Cottage cheese balls in Chinese sauce', 9, 170.00, 1),
+('Paneer Chilly', 'Paneer cubes tossed in chilli sauce', 9, 160.00, 1),
+('Mushroom Manchurian', 'Mushroom balls in Manchurian sauce', 9, 170.00, 1),
+('Mushroom Chilly', 'Mushroom tossed in spicy sauce', 9, 160.00, 1),
+
+-- 🔟 Chinese Rice
+('Chicken Fried Rice', 'Fried rice with chicken pieces', 10, 120.00, 1),
+('Chicken Noodles', 'Noodles stir-fried with chicken', 10, 120.00, 1),
+('Schezwan Chicken Fried Rice', 'Spicy Schezwan-style chicken fried rice', 10, 140.00, 1),
+('Schezwan Chicken Noodles', 'Schezwan-flavored chicken noodles', 10, 140.00, 1),
+('Mix Schezwan Noodles', 'Mixed noodles with chicken and veg', 10, 160.00, 1),
+('Mix Schezwan Rice', 'Mixed rice with chicken and veg', 10, 170.00, 1),
+('Mix Noodles', 'Noodles with chicken, egg, and veg', 10, 180.00, 1),
+('Mix Rice', 'Rice with chicken, egg, and veg', 10, 180.00, 1),
+('Veg Fried Rice', 'Fried rice with vegetables', 10, 130.00, 1),
+('Schezwan Veg Fried Rice', 'Spicy Schezwan vegetable rice', 10, 150.00, 1),
+
+-- 11️⃣ Soups
+('Chicken Soup', 'Hot chicken broth', 11, 80.00, 1),
+('Mutton Soup', 'Spiced mutton soup', 11, 100.00, 1),
+('Chicken Hot & Sour Soup', 'Spicy and tangy chicken soup', 11, 90.00, 1),
+('Veg Manchurian Soup', 'Vegetable soup with Manchurian balls', 11, 80.00, 1),
+('Veg Hot & Sour Soup', 'Hot and sour veg soup', 11, 80.00, 1),
+
+-- 12️⃣ Fries
+('French Fries', 'Classic crispy fries', 12, 70.00, 1),
+('Crinkle Fries', 'Curved-style potato fries', 12, 80.00, 1),
+('Masala Fries', 'Fries sprinkled with Indian spices', 12, 90.00, 1),
+('Peri Peri Fries', 'Fries tossed in peri peri seasoning', 12, 90.00, 1),
+
+-- 13️⃣ Fresh Juices
+('Lime', 'Fresh lime juice', 13, 30.00, 1),
+('Ginger Lime', 'Lime juice with ginger flavor', 13, 40.00, 1),
+('Moroccan Mint Lime', 'Refreshing mint lime blend', 13, 60.00, 1),
+('Lime Cooler', 'Chilled lime cooler drink', 13, 60.00, 1),
+('Orange', 'Fresh orange juice', 13, 60.00, 1),
+('Sweet Lime', 'Sweet lime juice', 13, 60.00, 1),
+('Pineapple', 'Pineapple fruit juice', 13, 60.00, 1),
+('Musk Melon', 'Melon fruit juice', 13, 60.00, 1),
+('Pomegranate', 'Freshly squeezed pomegranate juice', 13, 70.00, 1),
+
+-- 14️⃣ Mojitos
+('Blueberry Mojito', 'Refreshing blueberry mint mojito', 14, 70.00, 1),
+('Kiwi', 'Kiwi flavored mojito', 14, 70.00, 1),
+('Strawberry', 'Strawberry mint mojito', 14, 70.00, 1),
+('Blue', 'Blue mint cooler mojito', 14, 70.00, 1),
+('Blackberry', 'Fruity blackberry mojito', 14, 70.00, 1),
+('Litchi', 'Litchi mint mojito', 14, 70.00, 1),
+('Mango', 'Mango flavored mojito', 14, 70.00, 1),
+('Pineapple', 'Pineapple flavored mojito', 14, 70.00, 1),
+('Water Melon', 'Watermelon mojito', 14, 70.00, 1),
+('Grape', 'Grape flavored mojito', 14, 70.00, 1),
+('Orange', 'Citrus orange mojito', 14, 70.00, 1),
+('Blue Lagoon', 'Classic blue lagoon mocktail', 14, 70.00, 1);
 
 -- -------------------------
 -- ROOMS
 -- -------------------------
 CREATE TABLE rooms (
     room_number INT PRIMARY KEY,
-    room_type VARCHAR(50),
-    status ENUM('AVAILABLE','OCCUPIED') DEFAULT 'AVAILABLE'
+    room_type VARCHAR(30),
+    status ENUM('AVAILABLE','OCCUPIED','CLEANING') DEFAULT 'AVAILABLE'
 );
 
-INSERT INTO rooms VALUES
+INSERT INTO rooms (room_number, room_type, status)
+VALUES
 (101, 'Single', 'OCCUPIED'),
 (102, 'Double', 'OCCUPIED'),
 (201, 'Suite', 'AVAILABLE'),
 (202, 'Double', 'OCCUPIED'),
-(301, 'Single', 'OCCUPIED'),
-(302, 'Suite', 'AVAILABLE');
-
--- -------------------------
--- MENU CATEGORIES
--- -------------------------
-CREATE TABLE menu_categories (
-    category_id INT AUTO_INCREMENT PRIMARY KEY,
-    category_name VARCHAR(100) NOT NULL UNIQUE
-);
-
-INSERT INTO menu_categories (category_name) VALUES
-('Biryani'),
-('Rice'),
-('Roti Items'),
-('Tandoori & Barbeque'),
-('Egg Items'),
-('Indian Gravy (Non-Veg)'),
-('Indian Gravy (Veg)'),
-('Chinese Chicken'),
-('Chinese Veg'),
-('Chinese Rice'),
-('Soups'),
-('Fries'),
-('Fresh Juices'),
-('Mojitos');
-
--- -------------------------
--- MENU ITEMS
--- -------------------------
-CREATE TABLE menu_items (
-    menu_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(150) NOT NULL,
-    price DECIMAL(10,2) NOT NULL,
-    is_available BOOLEAN DEFAULT TRUE,
-    category_id INT NOT NULL,
-    FOREIGN KEY (category_id) REFERENCES menu_categories(category_id)
-);
-
--- Seed all menu items
-INSERT INTO menu_items (name, price, category_id) VALUES
--- Biryani
-('Chicken Biryani', 170, 1),
-('Mutton Biryani', 260, 1),
-('Egg Biryani', 120, 1),
-('Veg Biryani', 140, 1),
-('Paneer Biryani', 150, 1),
-('Tikka Biryani', 190, 1),
-
--- Rice
-('Ghee Rice', 100, 2),
-('Curd Rice', 90, 2),
-('Steam Rice', 80, 2),
-('Jeera Rice', 90, 2),
-('Masala Khichdi', 100, 2),
-
--- Roti
-('Tandoori Roti', 20, 3),
-('Butter Roti', 25, 3),
-('Naan', 30, 3),
-('Butter Naan', 40, 3),
-('Garlic Naan', 40, 3),
-('Kulcha', 30, 3),
-('Butter Kulcha', 40, 3),
-('Kerala Parota', 15, 3),
-
--- Tandoori & Barbeque
-('Chicken Tikka (Full)', 580, 4),
-('Chicken Tikka (Half)', 290, 4),
-('Chicken Tikka', 70, 4),
-('Chicken Tikka Boneless', 350, 4),
-('Reshmi Kabab (8pc)', 330, 4),
-('Chicken Seek Kabab (8pc)', 340, 4),
-('Paneer Tikka', 290, 4),
-
--- Egg Items
-('Egg Chilly', 90, 5),
-('Egg Manchurian', 90, 5),
-('Egg Pepper Fry', 90, 5),
-('Egg 65', 90, 5),
-('Boiled Egg', 10, 5),
-
--- Indian Gravy Non-Veg
-('Egg Masala', 90, 6),
-('Egg Kolapuri', 90, 6),
-('Chicken Masala', 170, 6),
-('Chicken Kadai', 190, 6),
-('Chicken Kolapuri', 190, 6),
-('Butter Chicken', 230, 6),
-('Chicken Punjabi', 260, 6),
-('Mutton Masala', 250, 6),
-('Mutton Hyderabadi', 280, 6),
-('Mutton Rogan Josh', 300, 6),
-
--- Indian Gravy Veg
-('Dal Fry', 90, 7),
-('Dal Tadka', 100, 7),
-('Mix Veg Curry', 100, 7),
-('Veg Kadai', 140, 7),
-('Veg Handi', 150, 7),
-('Kaju Masala', 240, 7),
-('Paneer Masala', 160, 7),
-('Paneer Butter Masala', 170, 7),
-('Paneer Tikka Masala', 200, 7),
-('Mushroom Kadai', 180, 7),
-('Mushroom Masala', 160, 7),
-
--- Chinese Chicken
-('Chicken Chilli Dry', 170, 8),
-('Chicken Manchurian', 170, 8),
-('Chicken Chilli Gravy', 180, 8),
-('Chicken Honey Chilly', 180, 8),
-('Chicken Chilli Boneless', 190, 8),
-('Chicken 65', 200, 8),
-('Chicken Lollipop', 230, 8),
-('Chicken Drumstick', 240, 8),
-('Schezwan Chicken', 180, 8),
-
--- Chinese Veg
-('Gobi Manchurian', 100, 9),
-('Gobi 65', 110, 9),
-('Gobi Chilly', 100, 9),
-('Paneer Manchurian', 170, 9),
-('Paneer Chilly', 160, 9),
-('Mushroom Manchurian', 170, 9),
-('Mushroom Chilly', 160, 9),
-
--- Chinese Rice
-('Chicken Fried Rice', 120, 10),
-('Chicken Noodles', 120, 10),
-('Schezwan Chicken Fried Rice', 140, 10),
-('Schezwan Chicken Noodles', 140, 10),
-('Mix Schezwan Noodles', 160, 10),
-('Mix Schezwan Rice', 170, 10),
-('Mix Noodles', 180, 10),
-('Mix Rice', 180, 10),
-('Veg Fried Rice', 130, 10),
-('Schezwan Veg Fried Rice', 150, 10),
-
--- Soups
-('Chicken Soup', 80, 11),
-('Mutton Soup', 100, 11),
-('Chicken Hot & Sour Soup', 90, 11),
-('Veg Manchurian Soup', 80, 11),
-('Veg Hot & Sour Soup', 80, 11),
-
--- Fries
-('French Fries', 70, 12),
-('Crinkle Fries', 80, 12),
-('Masala Fries', 90, 12),
-('Peri Peri Fries', 90, 12),
-
--- Fresh Juices
-('Lime', 30, 13),
-('Ginger Lime', 40, 13),
-('Moroccan Mint Lime', 60, 13),
-('Lime Cooler', 60, 13),
-('Orange Juice', 60, 13),
-('Sweet Lime Juice', 60, 13),
-('Pineapple Juice', 60, 13),
-('Musk Melon Juice', 60, 13),
-('Pomegranate Juice', 70, 13),
-
--- Mojitos
-('Blueberry Mojito', 70, 14),
-('Kiwi Mojito', 70, 14),
-('Strawberry Mojito', 70, 14),
-('Blue Mojito', 70, 14),
-('Blackberry Mojito', 70, 14),
-('Litchi Mojito', 70, 14),
-('Mango Mojito', 70, 14),
-('Pineapple Mojito', 70, 14),
-('Water Melon Mojito', 70, 14),
-('Grape Mojito', 70, 14),
-('Orange Mojito', 70, 14),
-('Blue Lagoon', 70, 14);
+(301, 'Single', 'AVAILABLE'),
+(302, 'Suite', 'OCCUPIED');
 
 -- -------------------------
 -- ORDERS
 -- -------------------------
 CREATE TABLE orders (
-    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT PRIMARY KEY AUTO_INCREMENT,
     guest_id INT NOT NULL,
     room_number INT NOT NULL,
-    status ENUM('PLACED','PREPARING','READY') DEFAULT 'PLACED',
-    total_amount DECIMAL(10,2) NOT NULL DEFAULT 0,
+    status ENUM('PLACED','PREPARING','READY','OUT_FOR_DELIVERY') DEFAULT 'PLACED',
+    subtotal DECIMAL(8,2) DEFAULT 0.00,
+    tax_amount DECIMAL(8,2) DEFAULT 0.00,
+    service_charge DECIMAL(8,2) DEFAULT 0.00,
+    total_amount DECIMAL(8,2) DEFAULT 0.00,
+    special_instructions VARCHAR(100),
     FOREIGN KEY (guest_id) REFERENCES users(user_id),
     FOREIGN KEY (room_number) REFERENCES rooms(room_number)
 );
 
-INSERT INTO orders (guest_id, room_number, status, total_amount) VALUES
-(1, 101, 'PLACED', 330.00),
-(1, 101, 'READY', 235.00);
+INSERT INTO orders (guest_id, room_number, status, subtotal, tax_amount, service_charge, total_amount, special_instructions)
+VALUES
+-- Order 1 by Ananya
+(1, 101, 'PLACED', 310.00, 15.50, 6.00, 331.50, 'Less spicy biryani please'),
+
+-- Order 2 by Rahul
+(2, 102, 'PREPARING', 220.00, 11.00, 4.40, 235.40, 'Serve with raita'),
+
+-- Order 3 by Meera
+(3, 202, 'READY', 450.00, 22.50, 9.00, 481.50, 'Extra napkins'),
+
+-- Order 4 by Ananya again
+(1, 101, 'OUT_FOR_DELIVERY', 180.00, 9.00, 3.60, 192.60, 'Hot and fresh');
 
 -- -------------------------
 -- ORDER ITEMS
 -- -------------------------
 CREATE TABLE order_items (
-    order_item_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_item_id INT PRIMARY KEY AUTO_INCREMENT,
     order_id INT NOT NULL,
     menu_id INT NOT NULL,
     quantity INT NOT NULL,
-    price DECIMAL(10,2) NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
+    unit_price DECIMAL(8,2) NOT NULL,
+    subtotal DECIMAL(8,2) NOT NULL,
+    special_notes VARCHAR(100),
+    FOREIGN KEY (order_id) REFERENCES orders(order_id),
     FOREIGN KEY (menu_id) REFERENCES menu_items(menu_id)
 );
 
-INSERT INTO order_items (order_id, menu_id, quantity, price) VALUES
-(1, 1, 1, 170),
-(1, 13, 2, 80),
-(1, 95, 1, 80),
+INSERT INTO order_items (order_id, menu_id, quantity, unit_price, subtotal, special_notes)
+VALUES
+-- Order 1 (Ananya - Biryani + Fries)
+(1, 1, 1, 170.00, 170.00, NULL), -- Chicken Biryani
+(1, 77, 2, 70.00, 140.00, 'Extra crispy fries'),
 
-(2, 2, 1, 260),
-(2, 14, 1, 30),
-(2, 92, 1, 80);
+-- Order 2 (Rahul - Paneer Butter Masala + Naan)
+(2, 55, 1, 170.00, 170.00, NULL), -- Paneer Butter Masala
+(2, 17, 2, 30.00, 60.00, NULL),   -- Naan
 
--- -------------------------
--- DELIVERIES
--- -------------------------
-CREATE TABLE deliveries (
-    delivery_id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT NOT NULL,
-    staff_id INT NOT NULL,
-    delivery_status ENUM('PENDING','IN_PROGRESS','DELIVERED') DEFAULT 'PENDING',
-    assigned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    delivered_at DATETIME NULL,
-    FOREIGN KEY (order_id) REFERENCES orders(order_id),
-    FOREIGN KEY (staff_id) REFERENCES users(user_id)
-);
+-- Order 3 (Meera - Chicken Fried Rice + Chicken Chilli Gravy)
+(3, 80, 1, 120.00, 120.00, NULL), -- Chicken Fried Rice
+(3, 63, 1, 180.00, 180.00, NULL), -- Chicken Chilli Gravy
+(3, 6, 1, 180.00, 180.00, 'Less oil'),
 
-INSERT INTO deliveries (order_id, staff_id, delivery_status) VALUES
-(1, 3, 'IN_PROGRESS'),
-(2, 3, 'DELIVERED');
+-- Order 4 (Ananya - Fresh Juice + Gobi Manchurian)
+(4, 92, 1, 60.00, 60.00, 'No ice'),
+(4, 69, 1, 100.00, 100.00, 'Extra sauce');
 
 -- -------------------------
 -- INVOICES
 -- -------------------------
 CREATE TABLE invoices (
-    invoice_id INT AUTO_INCREMENT PRIMARY KEY,
-    invoice_number VARCHAR(50) NOT NULL UNIQUE,
-    order_id INT NOT NULL,
-    subtotal DECIMAL(10,2) NOT NULL,
-    tax DECIMAL(10,2) NOT NULL,
-    service_charge DECIMAL(10,2) NOT NULL,
-    total_amount DECIMAL(10,2) NOT NULL,
-    paid BOOLEAN DEFAULT FALSE,
+    invoice_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT UNIQUE NOT NULL,
+    invoice_number VARCHAR(50) UNIQUE NOT NULL,
+    subtotal DECIMAL(8,2),
+    tax DECIMAL(8,2),
+    service_charge DECIMAL(8,2),
+    total_amount DECIMAL(8,2),
+    paid TINYINT(1) DEFAULT 0,
     FOREIGN KEY (order_id) REFERENCES orders(order_id)
 );
 
-INSERT INTO invoices (invoice_number, order_id, subtotal, tax, service_charge, total_amount, paid)
-VALUES 
-('INV-1001', 1, 300, 15, 15, 330, 0),
-('INV-1002', 2, 210, 10, 15, 235, 1);
-
+INSERT INTO invoices (order_id, invoice_number, subtotal, tax, service_charge, total_amount, paid)
+VALUES
+(1, 'INV5001', 310.00, 15.50, 6.00, 331.50, 0),
+(2, 'INV5002', 220.00, 11.00, 4.40, 235.40, 1),
+(3, 'INV5003', 450.00, 22.50, 9.00, 481.50, 0),
+(4, 'INV5004', 180.00, 9.00, 3.60, 192.60, 0);
 -- -------------------------
 -- PAYMENTS
 -- -------------------------
 CREATE TABLE payments (
-    payment_id INT AUTO_INCREMENT PRIMARY KEY,
+    payment_id INT PRIMARY KEY AUTO_INCREMENT,
     invoice_id INT NOT NULL,
-    amount DECIMAL(10,2) NOT NULL,
-    payment_method ENUM('CASH','CARD','UPI') NOT NULL,
-    paid_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    amount DECIMAL(8,2) NOT NULL,
+    payment_method ENUM('CASH','CARD','UPI','ROOM_CHARGE') NOT NULL,
+    reference VARCHAR(50),
+    paid_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (invoice_id) REFERENCES invoices(invoice_id)
 );
 
-INSERT INTO payments (invoice_id, amount, payment_method)
+INSERT INTO payments (invoice_id, amount, payment_method, reference)
 VALUES
-(2, 235, 'UPI');
+(2, 235.40, 'CARD', 'TXN2025PAY101');
+
+-- -------------------------
+-- DELIVERIES
+-- -------------------------
+CREATE TABLE deliveries (
+    delivery_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT UNIQUE NOT NULL,
+    staff_id INT NOT NULL,
+    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    delivered_at TIMESTAMP NULL,
+    delivery_status ENUM('ASSIGNED','IN_PROGRESS','DELIVERED') DEFAULT 'ASSIGNED',
+    FOREIGN KEY (order_id) REFERENCES orders(order_id),
+    FOREIGN KEY (staff_id) REFERENCES users(user_id)
+);
+
+INSERT INTO deliveries (order_id, staff_id, assigned_at, delivered_at, delivery_status)
+VALUES
+(4, 6, NOW() - INTERVAL 45 MINUTE, NOW() - INTERVAL 10 MINUTE, 'DELIVERED'),
+(3, 7, NOW() - INTERVAL 30 MINUTE, NULL, 'IN_PROGRESS');
