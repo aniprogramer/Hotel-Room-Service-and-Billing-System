@@ -1,3 +1,6 @@
+# Dev tools
+nodemon==3.1.0
+
 # Node.js dependencies for Hotel Room Service & Billing System
 express==5.1.0
 express-session==1.18.2
